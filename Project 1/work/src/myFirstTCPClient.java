@@ -1,3 +1,4 @@
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -15,6 +16,11 @@ public class myFirstTCPClient {
         int port = Integer.parseInt(args[1]);
         Socket socket = new Socket(addr, port);
 
+        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+        DataInputStream in = new DataInputStream(socket.getInputStream());
+
+        System.out.println("Client connected to server at " + addr + ":" + port);
+
         ArrayList<QuantityCodePair> pairs = new ArrayList<>();
         Random rand = new Random();
         int requestNumber = rand.nextInt(1000, 2000); // Random # between 1000 and 1999
@@ -31,11 +37,11 @@ public class myFirstTCPClient {
         }
 
         // Build byte array to send
-        // Request # (2 bytes) ; TML (2 bytes) ; Q1 (2 bytes) ; C1 (2 bytes) ; Q2 ; C2 ; ...
-        byte[] requestBytes = new byte[2 + 2 + pairs.size() * 4]; // 2 bytes for request #, 2 for TML, 4 for each pair
+        // Request # (2 bytes) ; TML (2 bytes) ; Q1 (2 bytes) ; C1 (2 bytes) ; Q2 ; C2 ; ... ; 0xFFFF
+        byte[] requestBytes = new byte[2 + 2 + pairs.size() * 4 + 2];
         requestBytes[0] = (byte) (requestNumber >> 8); // Request # high byte
         requestBytes[1] = (byte) (requestNumber & 0xFF); // Request # low byte
-        requestBytes[2] = (byte) (requestBytes.length >> 8); // TML high byte
+        requestBytes[2] = (byte) (requestBytes.length >> 8); // TML high byte, which is the total length of the message, including the request number and TML fields
         requestBytes[3] = (byte) (requestBytes.length & 0xFF); // TML low byte
         for (int i = 0; i < pairs.size(); i++) {
             QuantityCodePair pair = pairs.get(i);
@@ -45,23 +51,40 @@ public class myFirstTCPClient {
             requestBytes[offset + 2] = (byte) (pair.getCode() >> 8); // Code high byte
             requestBytes[offset + 3] = (byte) (pair.getCode() & 0xFF); // Code low byte
         }
+        requestBytes[requestBytes.length - 2] = (byte) (0xFF); // Last quantity high byte (indicating end of pairs)
+        requestBytes[requestBytes.length - 1] = (byte) (0xFF); // Last quantity low byte (indicating end of pairs)
+
+        // Log byte-by-byte representation of the request
+        for (byte b : requestBytes) {
+            System.out.printf("0x%02X ", b);
+        }
 
         // Log the request being sent
         System.out.println("Sending request #" + requestNumber + " with " + pairs.size() + " pair(s) to server:");
         // Log bytes
         System.out.print("Request bytes: ");
-        for (byte b : requestBytes) {
-            System.out.printf("%02X ", b);
-        }
         System.out.println();
 
-
         // Send pairs over TCP
-        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         out.write(requestBytes);
         out.flush();
 
-        System.out.println("Sent " + pairs.size() + " pair(s) to server.");
+        System.out.println("Sent " + pairs.size() + (pairs.size() > 1 ? " pairs " : " pair ") + "to server.");
+
+        // Wait for server response
+        short requestNum = in.readShort(); // Read request number from server response (2 bytes)
+        short tml = in.readShort(); // Read TML from server response (2 bytes)
+
+        if (tml == -1){
+            System.out.println("Error: Server responded with TML = -1, indicating a mismatch between TML and byte count.");
+            socket.close();
+            return;
+        }
+
+        // Read the remaining bytes
+        byte[] remaining = new byte[tml - 4];
+        in.readFully(remaining); // Read the remaining bytes based on TML
+
         socket.close();
     }
 }
