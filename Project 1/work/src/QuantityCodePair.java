@@ -1,3 +1,6 @@
+/**
+ * A simple utility class to hold a pair of short values: quantity and code.
+ */
 public class QuantityCodePair {
     private final short quantity;
     private final short code;
