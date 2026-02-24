@@ -116,8 +116,6 @@ public class myFirstTCPServer {
                     if (item != null) {
                         short cost = (short) (pair.getQuantity() * item.getPrice());
                         costs.add(cost);
-                        System.out.printf("  %-25s x%d @ $%d = $%d%n",
-                                item.getName(), pair.getQuantity(), item.getPrice(), cost);
                     }
                 }
 

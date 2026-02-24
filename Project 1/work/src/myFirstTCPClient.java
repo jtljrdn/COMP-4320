@@ -39,8 +39,16 @@ public class myFirstTCPClient {
                 System.out.print("Enter quantity: ");
                 short quantity = sc.nextShort();
                 if (quantity == -1) break;
+                if (quantity <= 0) {
+                    System.out.println("ERROR: Quantity must be between 0-32767. Please re-enter.");
+                    continue;
+                }
                 System.out.print("Enter code: ");
                 short code = sc.nextShort();
+                if (code < 0) {
+                    System.out.println("ERROR: Code must be between 0-32767. Please re-enter.");
+                    continue;
+                }
                 pairs.add(new QuantityCodePair(quantity, code));
             }
 
