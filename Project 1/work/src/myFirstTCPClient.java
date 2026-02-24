@@ -29,7 +29,7 @@ public class myFirstTCPClient {
 
         Random rand = new Random();
         Scanner sc = new Scanner(System.in);
-        int requestNumber = rand.nextInt(1000, 2000); // Random starting value between 1000 and 1999
+        int requestNumber = rand.nextInt(1000) + 1000;// Random starting value between 1000 and 1999
 
         while (true) {
             ArrayList<QuantityCodePair> pairs = new ArrayList<>();
