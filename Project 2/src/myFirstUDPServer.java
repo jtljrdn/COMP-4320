@@ -17,7 +17,7 @@ import java.util.Map;
 public class myFirstUDPServer {
     private static Map<Short, Item> loadCSV() throws IOException {
         Map<Short, Item> catalog = new HashMap<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("src/data.csv"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("data.csv"))) {
             String line;
             boolean firstLine = true;
             while ((line = br.readLine()) != null) {
