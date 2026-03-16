@@ -62,6 +62,13 @@ public class myFirstUDPServer {
 
             System.out.println("Received packet from " + receivePacket.getAddress() + ":" + receivePacket.getPort());
 
+            // Log request byte-by-byte
+            System.out.print("Request bytes: ");
+            for (byte b : bytes) {
+                System.out.printf("0x%02X ", b);
+            }
+            System.out.println();
+
             // Parse request header
             ByteBuffer buffer = ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN);
             short requestNumber = buffer.getShort();
@@ -80,13 +87,6 @@ public class myFirstUDPServer {
                 System.out.println("ERROR: TML (" + tml + ") does not match received byte count (" + receivePacket.getLength() + "). Sent error response.");
                 continue;
             }
-
-            // Log request byte-by-byte
-            System.out.print("Request bytes: ");
-            for (byte b : bytes) {
-                System.out.printf("0x%02X ", b);
-            }
-            System.out.println();
 
             // Decode pairs: Request # (2) | TML (2) | Q1 (2) | C1 (2) | ... | 0xFFFF (2)
             ArrayList<QuantityCodePair> pairs = new ArrayList<>();

@@ -142,21 +142,21 @@ public class myFirstUDPClient {
                 rows.add(new String[]{String.valueOf(itemNum++), itemName, "$" + CS1, String.valueOf(Q1), "$" + lineCost});
             }
 
-            // Print table
-            String fmt = "| %-6s | %-20s | %-9s | %-8s | %-13s |%n";
-            String divider = "+--------+----------------------+-----------+----------+---------------+";
-            System.out.println(divider);
-            System.out.printf(fmt, "Item #", "Description", "Unit Cost", "Quantity", "Cost Per Item");
-            System.out.println(divider);
-            for (String[] row : rows) {
-                System.out.printf(fmt, row[0], row[1], row[2], row[3], row[4]);
-                System.out.println(divider);
-            }
-            System.out.printf(fmt, "", "", "", "Total", "$" + computedTC);
-            System.out.println(divider);
-
             if (computedTC != TC) {
                 System.out.println("Error: the total cost in the response does not match the total computed by the client.");
+            } else {
+                // Print table only if TC check is successful
+                String fmt = "| %-6s | %-20s | %-9s | %-8s | %-13s |%n";
+                String divider = "+--------+----------------------+-----------+----------+---------------+";
+                System.out.println(divider);
+                System.out.printf(fmt, "Item #", "Description", "Unit Cost", "Quantity", "Cost Per Item");
+                System.out.println(divider);
+                for (String[] row : rows) {
+                    System.out.printf(fmt, row[0], row[1], row[2], row[3], row[4]);
+                    System.out.println(divider);
+                }
+                System.out.printf(fmt, "", "", "", "Total", "$" + computedTC);
+                System.out.println(divider);
             }
 
             requestNumber++;
